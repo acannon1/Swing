@@ -3,21 +3,21 @@ BULLISH = 1
 BEARISH = 0
 
 class CandleStick:
-  def __init__(self, op, cl, hi, lo, time):
-    self.op = op
-    self.cl = cl
-    self.hi = hi
-    self.lo = lo
-    self.body = cl - op
-    self.range = hi - lo
+  def __init__(self, o, c, h, l, time):
+    self.o = o
+    self.c = c
+    self.h = h
+    self.l = l
+    self.body = c - o
+    self.range = h - l
     if self.body < 0:
       self.direction = BEARISH
-      self.wick = hi - op
-      self.tail = cl - lo
+      self.wick = h - o
+      self.tail = c - l
     else:
       self.direction = BULLISH
-      self.wick = hi - cl
-      self.tail = op - lo
+      self.wick = h - c
+      self.tail = o - l
     self.time = time
     
 

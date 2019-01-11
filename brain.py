@@ -2,7 +2,7 @@ import socket #for sockets
 import sys	#for exit
 
 import CandleStick
-import fxn
+import analyzeCandleStick as fxn
 
 def main():
   candleSticks = []
