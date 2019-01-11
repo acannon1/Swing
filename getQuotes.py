@@ -2,15 +2,27 @@ import pandas as pd
 import pandas_datareader.data as web
 import datetime
 from pathlib import Path
-import CandleStick as cs
-import analyzeCandleStick as analyze
+import os
+
+#import CandleStick as cs
+#import analyzeCandleStick as analyze
+
+def file_exists(fn):
+    exists = os.path.isfile(fn)
+    if exists:
+        return 1
+    else:
+        return 0
 
 def write_to_file(ticker, f):
-    fn = ticker + "_day.csv";
-    if fn.is_file():
+    fn = "./quotes/" + ticker + "_day.csv";
+    exists = os.path.isfile(fn)
+    if exists:
+        print("old file")
         with open(fn, 'a') as outFile:
             f.to_csv(outFile, header=False)
     else:
+        print("new file")
         f.to_csv(fn)
 
 def create_candlestick(f):
@@ -26,10 +38,11 @@ def get_single_quote(ticker):
     f = web.DataReader([ticker], "yahoo", start=today)
     return f
 
-#symbols = ["FB","AAPL","NFLX","GOOG","BA","GS","BABA","TSLA"]
-symbols = ["FB"]
+#symbols_list = ["FB","AAPL","NFLX","GOOG","BA","GS","BABA","TSLA"]
+symbols_list = ["FB", "AAPL"]
 for ticker in symbols_list:
-    f =get_single_quote(ticker)
+    fn = "./quotes/" + ticker + "_day.csv";
+    f = get_single_quote(ticker)
     write_to_file(ticker, f)
     #cs = create_candlestick(f)
     #a = analyze.isHammer(cs)
