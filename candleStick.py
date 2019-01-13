@@ -4,6 +4,7 @@ BEARISH = 0
 
 class CandleStick:
   def __init__(self, o, c, h, l, time):
+  # def __init__(self, o, c, h, l):
     self.o = o
     self.c = c
     self.h = h
@@ -19,7 +20,3 @@ class CandleStick:
       self.wick = h - c
       self.tail = o - l
     self.time = time
-    
-
-
-    
