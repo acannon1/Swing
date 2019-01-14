@@ -12,7 +12,7 @@ def isHammer(cs0, cs1):
     #     return False
     return True
 
-def isStar(cs0):
+def isStar(cs0, cs1):
     if cs0.direction == BULLISH:
         return False
     elif cs0.tail/abs(cs0.body) > .2:
@@ -39,7 +39,34 @@ def isThreeBears(bar1, bar2, bar3):
         return False
     return True
 
-def getAvgRange(cs):
-  for i in cs:
-    sum = sum + cs[i].range
-  return sum/len(cs)
+def getAvgRange(data):
+    sum = 0
+    count = 0
+    length = 0
+    for cs in data:
+        if count > 2:
+            sum = sum + (float(cs[1]) - float(cs[2]))
+            length += 1
+        count += 1
+    return sum/length
+
+def majorMove(cs):
+    if abs(cs.body) < 4:
+        return False
+    elif cs.wick/abs(cs.body) > .15:
+        return False
+    elif cs.tail/abs(cs.body) > .15:
+        return False
+    return True
+
+def gapUp(cs0, cs1):
+    if cs1.h < cs0.l:
+        return True
+    else:
+        return False
+
+def gapDown(cs0, cs1):
+    if cs1.l > cs0.h:
+        return True
+    else:
+        return False

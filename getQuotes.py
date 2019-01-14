@@ -22,7 +22,6 @@ def write_to_file(exists, fn, f):
     else:
         print("new file")
         f.to_csv(fn)
-    f.close()
 
 def create_candlestick(f):
     h = f.iloc[1,0]
@@ -39,32 +38,41 @@ def get_single_quote(ticker):
 
 def get_multiple_quotes(ticker):
     today = datetime.datetime.now().strftime("%Y-%m-%d")
-    f = web.DataReader([ticker], "yahoo", start='2018-12-01', end='2019-01-11')
+    f = web.DataReader([ticker], "yahoo", start='2018-08-01', end='2019-01-11')
     return f
 
 def readCsvFile(fn):
     quotes = []
     with open(fn) as csvDataFile:
-        csvReader = csv.reader(csvDataFile)
-        count = 0
+        allData = csv.reader(csvDataFile)
+        # atr = analyze.getAvgRange(allData)
+        # print(atr)
+
         cs_0 = cs.CandleStick(0,0,0,0,"")
         cs_1 = cs.CandleStick(0,0,0,0,"")
         cs_2 = cs.CandleStick(0,0,0,0,"")
-        for row in csvReader:
+        count = 0
+        for row in allData:
             if count > 2:
                 cs_2 = cs_1
                 cs_1 = cs_0
                 cs_0 = cs.CandleStick(float(row[3]),float(row[4]),float(row[1]),float(row[2]), row[0])
                 a = analyze.isHammer(cs_0, cs_1)
                 b = analyze.isStar(cs_0, cs_1)
+                c = analyze.majorMove(cs_0)
+                d = analyze.gapUp(cs_0, cs_1)
+                e = analyze.gapDown(cs_0, cs_1)
                 ratio = abs(cs_0.body)/cs_0.range
-                print(cs_0.time, b, ", h=", cs_0.h,", body=", cs_0.body,", dir=", cs_0.direction, ", wick=", cs_0.wick, ratio)
+                wr = cs_0.wick/abs(cs_0.body)
+                tr = cs_0.tail/abs(cs_0.body)
+                # print(cs_0.time, "\t%.2f" % cs_0.body, "\t%.2f" % cs_0.wick, "\t%.2f" % cs_0.tail, "\t%.2f" % wr, "\t%.2f" % tr)
+                print(cs_0.time, "\t", a, "\t", b, "\t", c, "\t", d, "\t", e)
 
             count += 1
 
 def process_data():
     #symbols_list = ["FB","AAPL","NFLX","GOOG","BA","GS","BABA","TSLA"]
-    symbols_list = ["AAPL", "FB"]
+    symbols_list = ["AAPL"]
     for ticker in symbols_list:
         fn = "./quotes/" + ticker + "_day.csv";
         if file_exists(fn):
