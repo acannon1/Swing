@@ -1,6 +1,6 @@
 import pandas as pd
 import pandas_datareader.data as web
-import datetime
+import datetime as datetime
 from pathlib import Path
 import os
 import csv
@@ -28,8 +28,8 @@ def write_to_file(exists, fn, f):
         last_line = f1.readlines()[-1]
         f1.close()
         last = last_line.split(",")
-        date = (datetime.datetime.strptime(last[0], DATE_FORMAT)).strftime(DATE_FORMAT)
-        today = datetime.datetime.now().strftime(DATE_FORMAT)
+        date = (datetime.strptime(last[0], DATE_FORMAT)).strftime(DATE_FORMAT)
+        today = datetime.now().strftime(DATE_FORMAT)
         if date != today:
             print("date not found")
             with open(fn, 'a') as outFile:
@@ -57,13 +57,13 @@ def create_candlestick(f):
     return candlestick
 
 def get_daily_quote(ticker):
-    today = datetime.datetime.now().strftime(DATE_FORMAT)
+    today = datetime.now().strftime(DATE_FORMAT)
     f = web.DataReader([ticker], "yahoo", start=today)
     print(f.tail(1))
     return f
 
 def get_history_quotes(ticker):
-    today = datetime.datetime.now().strftime(DATE_FORMAT)
+    today = datetime.now().strftime(DATE_FORMAT)
     f = web.DataReader([ticker], "yahoo", start='2018-08-01', end=today)
     return f
 
@@ -72,7 +72,6 @@ def analyze_data(fn):
     with open(fn) as csvDataFile:
         allData = csv.reader(csvDataFile)
         atr = analyze.getAvgRange(allData)
-        print(atr)
 
     with open(fn) as csvDataFile:
         allData = csv.reader(csvDataFile)
@@ -117,9 +116,9 @@ def back_test():
 back_test()
 
 
-#now = datetime.datetime.now()
+#now = datetime.now()
 #today = now.strftime("%Y-%m-%d")
-# today = datetime.datetime.now().strftime("%Y-%m-%d")
+# today = datetime.now().strftime("%Y-%m-%d")
 # f = web.DataReader(["AAPL"], "yahoo", start=today)
 # print(f)
 # h = f.iloc[1,0]
