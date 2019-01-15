@@ -1,7 +1,7 @@
 BULLISH = 1
 BEARISH = 0
 
-def isHammer(cs0, cs1):
+def hammer(cs0, cs1):
     if cs0.direction == BEARISH:
         return False
     elif cs0.wick/abs(cs0.body) > .4:
@@ -12,7 +12,7 @@ def isHammer(cs0, cs1):
     #     return False
     return True
 
-def isStar(cs0, cs1):
+def star(cs0, cs1):
     if cs0.direction == BULLISH:
         return False
     elif cs0.tail/abs(cs0.body) > .2:
@@ -23,16 +23,19 @@ def isStar(cs0, cs1):
     #     return False
     return True
 
-def isCloudCover(cs0, cs1):
-    # if cs.direction == BULLISH:
-    #     return False
-    # elif cs.tail/abs(cs.body) > .2:
-    #     return False
-    # elif abs(cs.body)/cs.range > .3:
-    #     return False
+#THIS NEEDS MORE REFINING
+def darkCloudCover(cs0, cs1):
+    if cs0.direction == BULLISH:
+        return False
+    elif cs1.direction == BEARISH:
+        return False
+    elif cs0.c > cs1.o:
+        return False
+    elif cs0.o < cs1.c:
+        return False
     return True
 
-def isThreeBears(bar1, bar2, bar3):
+def threeBears(bar1, bar2, bar3):
     if bar1.o > bar2.open:
         return False
     elif bar2.high > bar3.high:
