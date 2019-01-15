@@ -56,23 +56,26 @@ def create_candlestick(f):
     candlestick = cs(o,c,h,l)
     return candlestick
 
-def get_single_quote(ticker):
+def get_daily_quote(ticker):
     today = datetime.datetime.now().strftime(DATE_FORMAT)
     f = web.DataReader([ticker], "yahoo", start=today)
+    print(f.tail(1))
     return f
 
-def get_multiple_quotes(ticker):
+def get_history_quotes(ticker):
     today = datetime.datetime.now().strftime(DATE_FORMAT)
     f = web.DataReader([ticker], "yahoo", start='2018-08-01', end=today)
     return f
 
-def readCsvFile(fn):
+def analyze_data(fn):
     quotes = []
     with open(fn) as csvDataFile:
         allData = csv.reader(csvDataFile)
-        # atr = analyze.getAvgRange(allData)
-        # print(atr)
+        atr = analyze.getAvgRange(allData)
+        print(atr)
 
+    with open(fn) as csvDataFile:
+        allData = csv.reader(csvDataFile)
         cs_0 = cs.CandleStick(0,0,0,0,"")
         cs_1 = cs.CandleStick(0,0,0,0,"")
         cs_2 = cs.CandleStick(0,0,0,0,"")
@@ -84,7 +87,7 @@ def readCsvFile(fn):
                 cs_0 = cs.CandleStick(float(row[3]),float(row[4]),float(row[1]),float(row[2]), row[0])
                 a = analyze.hammer(cs_0, cs_1)
                 b = analyze.star(cs_0, cs_1)
-                c = analyze.majorMove(cs_0)
+                c = analyze.majorMove(cs_0, atr)
                 d = analyze.gapUp(cs_0, cs_1)
                 e = analyze.gapDown(cs_0, cs_1)
                 ratio = abs(cs_0.body)/cs_0.range
@@ -99,19 +102,19 @@ def daily():
     for ticker in symbols_list:
         fn = "./quotes/" + ticker + "_day.csv";
         if file_exists(fn):
-            f = get_single_quote(ticker)
+            f = get_daily_quote(ticker)
             write_to_file(OLD, fn, f)
         else:
-            f = get_multiple_quotes(ticker)
+            f = get_history_quotes(ticker)
             write_to_file(NEW, fn, f)
 
 def back_test():
     for ticker in symbols_list:
         fn = "./quotes/" + ticker + "_day.csv";
-        quotes = readCsvFile(fn)
+        quotes = analyze_data(fn)
 
-daily()
-# back_test()
+# daily()
+back_test()
 
 
 #now = datetime.datetime.now()

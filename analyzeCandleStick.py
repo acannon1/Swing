@@ -53,8 +53,8 @@ def getAvgRange(data):
         count += 1
     return sum/length
 
-def majorMove(cs):
-    if abs(cs.body) < 4:
+def majorMove(cs, atr):
+    if abs(cs.body) < atr:
         return False
     elif cs.wick/abs(cs.body) > .15:
         return False
