@@ -1,5 +1,6 @@
 import pandas as pd
 import pandas_datareader.data as web
+from pandas_datareader.data import Options
 import datetime as datetime
 from pathlib import Path
 import os
@@ -28,22 +29,13 @@ def write_to_file(exists, fn, f):
         last_line = f1.readlines()[-1]
         f1.close()
         last = last_line.split(",")
-        date = (datetime.strptime(last[0], DATE_FORMAT)).strftime(DATE_FORMAT)
-        today = datetime.now().strftime(DATE_FORMAT)
+        date = (datetime.datetime.strptime(last[0], DATE_FORMAT)).strftime(DATE_FORMAT)
+        today = datetime.datetime.now().strftime(DATE_FORMAT)
         if date != today:
             print("date not found")
+            print(f)
             with open(fn, 'a') as outFile:
-                f.to_csv(outFile, header=False)
-            # f2 = open(fn, "r")
-            # last_line_1 = f1.readlines()[-1]
-            # last_line_2 = f1.readlines()[-2]
-            # f2.close()
-            # if last_line_1 == last_line_2:
-
-        # with open(fn) as csvDataFile:
-        #
-        #     row_count = sum(1 for line in csvDataFile)
-        #     print(csvDataFile[row_count])
+                f.tail(1).to_csv(outFile, header=False)
     else:
         print("new file")
         f.to_csv(fn)
@@ -57,15 +49,18 @@ def create_candlestick(f):
     return candlestick
 
 def get_daily_quote(ticker):
-    today = datetime.now().strftime(DATE_FORMAT)
+    today = datetime.datetime.now().strftime(DATE_FORMAT)
     f = web.DataReader([ticker], "yahoo", start=today)
-    print(f.tail(1))
     return f
 
 def get_history_quotes(ticker):
     today = datetime.now().strftime(DATE_FORMAT)
     f = web.DataReader([ticker], "yahoo", start='2018-08-01', end=today)
     return f
+
+def get_options(ticker):
+    tmp_df = Options(ticker, 'yahoo').get_all_data()
+    print(tmp_df)
 
 def analyze_data(fn):
     quotes = []
@@ -89,11 +84,14 @@ def analyze_data(fn):
                 c = analyze.majorMove(cs_0, atr)
                 d = analyze.gapUp(cs_0, cs_1)
                 e = analyze.gapDown(cs_0, cs_1)
-                ratio = abs(cs_0.body)/cs_0.range
-                wr = cs_0.wick/abs(cs_0.body)
-                tr = cs_0.tail/abs(cs_0.body)
-                # print(cs_0.time, "\t%.2f" % cs_0.body, "\t%.2f" % cs_0.wick, "\t%.2f" % cs_0.tail, "\t%.2f" % wr, "\t%.2f" % tr)
-                print(cs_0.time, "\t", a, "\t", b, "\t", c, "\t", d, "\t", e)
+                f = analyze.bearishEngulfing(cs_0, cs_1)
+                g = analyze.bullishEngulfing(cs_0, cs_1)
+                h = analyze.piercingLine(cs_0, cs_1)
+                i = analyze.blackMarubozu(cs_0, atr)
+                j = analyze.whiteMarubozu(cs_0, atr)
+                k = analyze.bearishDoji(cs_0, cs_1)
+                l = analyze.bullishDoji(cs_0, cs_1)
+                print(cs_0.time, "\t", a, "\t", b, "\t", c, "\t", d, "\t", e, "\t", f, "\t", g, "\t", h, "\t", i, "\t", j, "\t", k, "\t", l)
 
             count += 1
 
@@ -112,7 +110,7 @@ def back_test():
         fn = "./quotes/" + ticker + "_day.csv";
         quotes = analyze_data(fn)
 
-# daily()
+daily()
 back_test()
 
 

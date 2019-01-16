@@ -4,7 +4,7 @@ BEARISH = 0
 def hammer(cs0, cs1):
     if cs0.direction == BEARISH:
         return False
-    elif cs0.wick/abs(cs0.body) > .4:
+    elif cs0.us/abs(cs0.body) > .4:
         return False
     elif abs(cs0.body)/cs0.range > .2:
         return False
@@ -15,7 +15,7 @@ def hammer(cs0, cs1):
 def star(cs0, cs1):
     if cs0.direction == BULLISH:
         return False
-    elif cs0.tail/abs(cs0.body) > .2:
+    elif cs0.ls/abs(cs0.body) > .2:
         return False
     elif abs(cs0.body)/cs0.range > .3:
         return False
@@ -23,15 +23,50 @@ def star(cs0, cs1):
     #     return False
     return True
 
-#THIS NEEDS MORE REFINING
-def darkCloudCover(cs0, cs1):
+def bearishEngulfing(cs0, cs1):
     if cs0.direction == BULLISH:
         return False
     elif cs1.direction == BEARISH:
         return False
-    elif cs0.c > cs1.o:
+    elif cs1.c > cs0.o:
         return False
-    elif cs0.o < cs1.c:
+    elif cs1.o < cs0.c:
+        return False
+    elif cs1.h > cs0.h:
+        return False
+    elif cs1.l < cs0.l:
+        return False
+    return True
+
+def bullishEngulfing(cs0, cs1):
+    if cs0.direction == BEARISH:
+        return False
+    elif cs1.direction == BULLISH:
+        return False
+    elif cs1.o > cs0.c:
+        return False
+    elif cs1.c < cs0.o:
+        return False
+    elif cs1.h > cs0.h:
+        return False
+    elif cs1.l < cs0.l:
+        return False
+    return True
+
+def piercingLine(cs0, cs1):
+    if cs0.direction == BEARISH:
+        return False
+    elif cs1.direction == BULLISH:
+        return False
+    elif cs1.o < cs0.o:
+        return False
+    elif cs1.c < cs0.c:
+        return False
+    elif cs1.h < cs0.h:
+        return False
+    elif cs1.l < cs0.l:
+        return False
+    elif cs0.c < (cs1.range/2 + cs1.c):
         return False
     return True
 
@@ -56,9 +91,9 @@ def getAvgRange(data):
 def majorMove(cs, atr):
     if abs(cs.body) < atr:
         return False
-    elif cs.wick/abs(cs.body) > .15:
+    elif cs.us/abs(cs.body) > .15:
         return False
-    elif cs.tail/abs(cs.body) > .15:
+    elif cs.ls/abs(cs.body) > .15:
         return False
     return True
 
@@ -73,3 +108,43 @@ def gapDown(cs0, cs1):
         return True
     else:
         return False
+
+def blackMarubozu(cs, atr):
+    if cs.h != cs.o:
+        return False
+    elif cs.l != cl.c:
+        return False
+    elif cs.range < atr:
+        return False
+    return True
+
+def whiteMarubozu(cs, atr):
+    if cs.h != cs.c:
+        return False
+    elif cs.l != cl.o:
+        return False
+    elif cs.range < atr:
+        return False
+    return True
+
+def bearishDoji(cs0, cs1):
+    if abs(cs0.o-cs0.c)/cs0.range > .05:
+        return False
+    elif abs(cs0.h - cs0.c)/cs0.range < .7:
+        return False
+    elif abs(cs0.c - cs0.l)/cs0.range > .3:
+        return False
+    elif cs0.h < cs1.h:
+        return False
+    return True
+
+def bullishDoji(cs0, cs1):
+    if abs(cs0.o-cs0.c)/cs0.range > .05:
+        return False
+    elif abs(cs0.h - cs0.c)/cs0.range > .3:
+        return False
+    elif abs(cs0.c - cs0.l)/cs0.range < .7:
+        return False
+    elif cs0.l > cs1.l:
+        return False
+    return True
