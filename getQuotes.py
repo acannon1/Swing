@@ -6,7 +6,8 @@ from pathlib import Path
 import os
 import csv
 import candleStick as cs
-import analyzeCandleStick as analyze
+import analyzeChart as analyze
+# import nasdaqOptions as options
 
 NEW = 0
 OLD = 1
@@ -62,6 +63,50 @@ def get_options(ticker):
     tmp_df = Options(ticker, 'yahoo').get_all_data()
     print(tmp_df)
 
+def make_decision(value, time):
+    if value:
+        print ("OPEN TRADE")
+        verbage = ''
+        if value & 0x1:
+            print("HAMMER")
+            verbage += "HAMMER "
+        if value & 0x2:
+            print("STAR")
+            verbage += "STAR "
+        if value & 0x4:
+            print("MAJOR MOVE")
+            verbage += "MAJOR MOVE "
+        if value & 0x8:
+            print("GAP UP")
+            verbage += "GAP UP "
+        if value & 0x10:
+            print("GAP DOWN")
+            verbage += "GAP DOWN "
+        if value & 0x20:
+            print("BEARISH ENGULFING")
+            verbage += "BEARISH ENGULFING "
+        if value & 0x40:
+            print("BULLISH ENGULFING")
+            verbage += "BULLISH ENGULFING "
+        if value & 0x80:
+            print("PIERCING LINE")
+            verbage += "PIERCING LINE "
+        if value & 0x100:
+            print("BLACK MARUBOZU")
+            verbage += "BLACK MARUBOZU "
+        if value & 0x200:
+            print("WHITE MARUBOZU")
+            verbage += "WHITE MARUBOZU "
+        if value & 0x400:
+            print("BEARISH DOJI")
+            verbage += "BEARISH DOJI "
+        if value & 0x800:
+            print("BULLISH DOJI")
+            verbage += "BULLISH DOJI "
+
+        with open('./quotes/results.txt', 'a') as results:
+            results.write('%r OPEN TRADE %s %r\n' %(time, value, verbage))
+
 def analyze_data(fn):
     quotes = []
     with open(fn) as csvDataFile:
@@ -79,20 +124,24 @@ def analyze_data(fn):
                 cs_2 = cs_1
                 cs_1 = cs_0
                 cs_0 = cs.CandleStick(float(row[3]),float(row[4]),float(row[1]),float(row[2]), row[0])
-                a = analyze.hammer(cs_0, cs_1)
-                b = analyze.star(cs_0, cs_1)
-                c = analyze.majorMove(cs_0, atr)
-                d = analyze.gapUp(cs_0, cs_1)
-                e = analyze.gapDown(cs_0, cs_1)
-                f = analyze.bearishEngulfing(cs_0, cs_1)
-                g = analyze.bullishEngulfing(cs_0, cs_1)
-                h = analyze.piercingLine(cs_0, cs_1)
-                i = analyze.blackMarubozu(cs_0, atr)
-                j = analyze.whiteMarubozu(cs_0, atr)
-                k = analyze.bearishDoji(cs_0, cs_1)
-                l = analyze.bullishDoji(cs_0, cs_1)
-                print(cs_0.time, "\t", a, "\t", b, "\t", c, "\t", d, "\t", e, "\t", f, "\t", g, "\t", h, "\t", i, "\t", j, "\t", k, "\t", l)
 
+                a, av = analyze.hammer(cs_0, cs_1)
+                b, bv = analyze.star(cs_0, cs_1)
+                c, cv = analyze.majorMove(cs_0, atr)
+                d, dv = analyze.gapUp(cs_0, cs_1)
+                e, ev = analyze.gapDown(cs_0, cs_1)
+                f, fv = analyze.bearishEngulfing(cs_0, cs_1)
+                g, gv = analyze.bullishEngulfing(cs_0, cs_1)
+                h, hv = analyze.piercingLine(cs_0, cs_1)
+                i, iv = analyze.blackMarubozu(cs_0, atr)
+                j, jv = analyze.whiteMarubozu(cs_0, atr)
+                k, kv = analyze.bearishDoji(cs_0, cs_1)
+                l, lv = analyze.bullishDoji(cs_0, cs_1)
+                # print(cs_0.time, "\t", a, "\t", b, "\t", c, "\t", d, "\t", e, "\t", f, "\t", g, "\t", h, "\t", i, "\t", j, "\t", k, "\t", l)
+
+                value = av | bv | cv | dv | ev | fv | gv | hv | iv | jv | kv | lv
+
+                make_decision(value, cs_0.time)
             count += 1
 
 def daily():
@@ -112,8 +161,11 @@ def back_test():
 
 daily()
 back_test()
-
-
+# options1 = options.NasdaqOptions('AAPL',2)
+# calls, puts = options1.get_options_table()
+# print(calls)
+ # print('\n######\nCalls:\n######\n', calls,\
+ #        '\n\n######\nPuts:\n######\n', puts)
 #now = datetime.now()
 #today = now.strftime("%Y-%m-%d")
 # today = datetime.now().strftime("%Y-%m-%d")
