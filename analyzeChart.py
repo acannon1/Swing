@@ -25,7 +25,7 @@ def star(cs0, cs1):
     #     return False, 0
     return True, 0x02
 
-def bearishEngulfing(cs0, cs1):
+def bearish_engulfing(cs0, cs1):
     if cs0.direction == BULLISH:
         return False, 0
     elif cs1.direction == BEARISH:
@@ -40,7 +40,7 @@ def bearishEngulfing(cs0, cs1):
         return False, 0
     return True, 0x20
 
-def bullishEngulfing(cs0, cs1):
+def bullish_engulfing(cs0, cs1):
     if cs0.direction == BEARISH:
         return False, 0
     elif cs1.direction == BULLISH:
@@ -55,7 +55,7 @@ def bullishEngulfing(cs0, cs1):
         return False, 0
     return True, 0x040
 
-def piercingLine(cs0, cs1):
+def piercing_line(cs0, cs1):
     if cs0.direction == BEARISH:
         return False, 0
     elif cs1.direction == BULLISH:
@@ -79,7 +79,7 @@ def threeBears(bar1, bar2, bar3):
         return False, 0
     return True
 
-def getAvgRange(data):
+def get_avg_range(data):
     sum = 0
     count = 0
     length = 0
@@ -90,7 +90,7 @@ def getAvgRange(data):
         count += 1
     return sum/length
 
-def majorMove(cs, atr):
+def major_move(cs, atr):
     if abs(cs.body) < atr:
         return False, 0
     elif cs.us/abs(cs.body) > .15:
@@ -99,19 +99,19 @@ def majorMove(cs, atr):
         return False, 0
     return True, 0x004
 
-def gapUp(cs0, cs1):
+def gap_up(cs0, cs1):
     if cs1.h < cs0.l:
         return True, 0x008
     else:
         return False, 0
 
-def gapDown(cs0, cs1):
+def gap_down(cs0, cs1):
     if cs1.l > cs0.h:
         return True, 0x010
     else:
         return False, 0
 
-def blackMarubozu(cs, atr):
+def black_marubozu(cs, atr):
     if cs.h != cs.o:
         return False, 0
     elif cs.l != cl.c:
@@ -120,7 +120,7 @@ def blackMarubozu(cs, atr):
         return False, 0
     return True, 0x100
 
-def whiteMarubozu(cs, atr):
+def white_marubozu(cs, atr):
     if cs.h != cs.c:
         return False, 0
     elif cs.l != cl.o:
@@ -129,7 +129,7 @@ def whiteMarubozu(cs, atr):
         return False, 0
     return True, 0x200
 
-def bearishDoji(cs0, cs1):
+def bearish_doji(cs0, cs1):
     if abs(cs0.o-cs0.c)/cs0.range > .05:
         return False, 0
     elif abs(cs0.h - cs0.c)/cs0.range < .7:
@@ -140,7 +140,7 @@ def bearishDoji(cs0, cs1):
         return False, 0
     return True, 0x400
 
-def bullishDoji(cs0, cs1):
+def bullish_doji(cs0, cs1):
     if abs(cs0.o-cs0.c)/cs0.range > .05:
         return False, 0
     elif abs(cs0.h - cs0.c)/cs0.range > .3:

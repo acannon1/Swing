@@ -7,6 +7,7 @@ import os
 import csv
 import candleStick as cs
 import analyzeChart as analyze
+from collections import deque
 # import nasdaqOptions as options
 
 NEW = 0
@@ -25,7 +26,6 @@ def file_exists(fn):
 
 def write_to_file(exists, fn, f):
     if exists:
-        print("old file")
         f1 = open(fn, "r")
         last_line = f1.readlines()[-1]
         f1.close()
@@ -33,8 +33,6 @@ def write_to_file(exists, fn, f):
         date = (datetime.datetime.strptime(last[0], DATE_FORMAT)).strftime(DATE_FORMAT)
         today = datetime.datetime.now().strftime(DATE_FORMAT)
         if date != today:
-            print("date not found")
-            print(f)
             with open(fn, 'a') as outFile:
                 f.tail(1).to_csv(outFile, header=False)
     else:
@@ -108,41 +106,37 @@ def make_decision(value, time):
             results.write('%r OPEN TRADE %s %r\n' %(time, value, verbage))
 
 def analyze_data(fn):
-    quotes = []
+    a, av = analyze.hammer(cs_0, cs_1)
+    b, bv = analyze.star(cs_0, cs_1)
+    c, cv = analyze.major_move(cs_0, atr)
+    d, dv = analyze.gap_up(cs_0, cs_1)
+    e, ev = analyze.gap_down(cs_0, cs_1)
+    f, fv = analyze.bearish_engulfing(cs_0, cs_1)
+    g, gv = analyze.bullish_engulfing(cs_0, cs_1)
+    h, hv = analyze.piercing_line(cs_0, cs_1)
+    i, iv = analyze.black_marubozu(cs_0, atr)
+    j, jv = analyze.white_marubozu(cs_0, atr)
+    k, kv = analyze.bearish_doji(cs_0, cs_1)
+    l, lv = analyze.bullish_doji(cs_0, cs_1)
+    # print(cs_0.time, "\t", a, "\t", b, "\t", c, "\t", d, "\t", e, "\t", f, "\t", g, "\t", h, "\t", i, "\t", j, "\t", k, "\t", l)
+    value = av | bv | cv | dv | ev | fv | gv | hv | iv | jv | kv | lv
+    make_decision(value, cs_0.time)
+
+def get_last_three(fn):
     with open(fn) as csvDataFile:
         allData = csv.reader(csvDataFile)
-        atr = analyze.getAvgRange(allData)
+        atr = analyze.get_avg_range(allData)
 
-    with open(fn) as csvDataFile:
-        allData = csv.reader(csvDataFile)
-        cs_0 = cs.CandleStick(0,0,0,0,"")
-        cs_1 = cs.CandleStick(0,0,0,0,"")
-        cs_2 = cs.CandleStick(0,0,0,0,"")
-        count = 0
-        for row in allData:
-            if count > 2:
-                cs_2 = cs_1
-                cs_1 = cs_0
-                cs_0 = cs.CandleStick(float(row[3]),float(row[4]),float(row[1]),float(row[2]), row[0])
+    with open(fn, 'r') as f:
+        lines = f.readlines()
+    # with open(fn) as csvDataFile:
+    #     allData = csv.reader(csvDataFile)
+        # lines = allData.readlines()
+        row0 = lines[-1]
+        row1 = lines[-2]
+        row2 = lines[-3]
 
-                a, av = analyze.hammer(cs_0, cs_1)
-                b, bv = analyze.star(cs_0, cs_1)
-                c, cv = analyze.majorMove(cs_0, atr)
-                d, dv = analyze.gapUp(cs_0, cs_1)
-                e, ev = analyze.gapDown(cs_0, cs_1)
-                f, fv = analyze.bearishEngulfing(cs_0, cs_1)
-                g, gv = analyze.bullishEngulfing(cs_0, cs_1)
-                h, hv = analyze.piercingLine(cs_0, cs_1)
-                i, iv = analyze.blackMarubozu(cs_0, atr)
-                j, jv = analyze.whiteMarubozu(cs_0, atr)
-                k, kv = analyze.bearishDoji(cs_0, cs_1)
-                l, lv = analyze.bullishDoji(cs_0, cs_1)
-                # print(cs_0.time, "\t", a, "\t", b, "\t", c, "\t", d, "\t", e, "\t", f, "\t", g, "\t", h, "\t", i, "\t", j, "\t", k, "\t", l)
-
-                value = av | bv | cv | dv | ev | fv | gv | hv | iv | jv | kv | lv
-
-                make_decision(value, cs_0.time)
-            count += 1
+    return atr, row0, row1, row2
 
 def daily():
     for ticker in symbols_list:
@@ -154,10 +148,38 @@ def daily():
             f = get_history_quotes(ticker)
             write_to_file(NEW, fn, f)
 
+        atr, row0, row1, row2 = get_last_three(fn)
+        print(row1)
+
+    	cs_0 = cs.CandleStick(float(row0[3]),float(row0[4]),
+        float(row0[1]),float(row0[2]), row0[0])
+    	cs_1 = cs.CandleStick(float(row1[3]),float(row1[4]),
+        float(row1[1]),float(row1[2]), row1[0])
+    	cs_2 = cs.CandleStick(float(row2[3]),float(row2[4]),
+        float(row2[1]),float(row2[2]), row2[0])
+        analyze_data(atr, cs_0, cs_1, cs_2)
+
+
 def back_test():
     for ticker in symbols_list:
         fn = "./quotes/" + ticker + "_day.csv";
-        quotes = analyze_data(fn)
+        with open(fn) as csvDataFile:
+            allData = csv.reader(csvDataFile)
+            atr = analyze.get_avg_range(allData)
+
+        with open(fn) as csvDataFile:
+            allData = csv.reader(csvDataFile)
+            cs_0 = cs.CandleStick(0,0,0,0,"")
+            cs_1 = cs.CandleStick(0,0,0,0,"")
+            cs_2 = cs.CandleStick(0,0,0,0,"")
+            count = 0
+            for row in allData:
+                if count > 2:
+                    cs_2 = cs_1
+                    cs_1 = cs_0
+                    cs_0 = cs.CandleStick(float(row[3]),float(row[4]),float(row[1]),float(row[2]), row[0])
+                    quotes = analyze_data(fn)
+                    count += 1
 
 daily()
 back_test()
@@ -166,12 +188,3 @@ back_test()
 # print(calls)
  # print('\n######\nCalls:\n######\n', calls,\
  #        '\n\n######\nPuts:\n######\n', puts)
-#now = datetime.now()
-#today = now.strftime("%Y-%m-%d")
-# today = datetime.now().strftime("%Y-%m-%d")
-# f = web.DataReader(["AAPL"], "yahoo", start=today)
-# print(f)
-# h = f.iloc[1,0]
-# l = f.iloc[1,1]
-# o = f.iloc[1,2]
-# c = f.iloc[1,3]
