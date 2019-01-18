@@ -105,7 +105,7 @@ def make_decision(value, time):
         with open('./quotes/results.txt', 'a') as results:
             results.write('%r OPEN TRADE %s %r\n' %(time, value, verbage))
 
-def analyze_data(fn):
+def analyze_data(cs_0, cs_1, cs_2, atr):
     a, av = analyze.hammer(cs_0, cs_1)
     b, bv = analyze.star(cs_0, cs_1)
     c, cv = analyze.major_move(cs_0, atr)
@@ -129,9 +129,6 @@ def get_last_three(fn):
 
     with open(fn, 'r') as f:
         lines = f.readlines()
-    # with open(fn) as csvDataFile:
-    #     allData = csv.reader(csvDataFile)
-        # lines = allData.readlines()
         row0 = lines[-1]
         row1 = lines[-2]
         row2 = lines[-3]
@@ -149,15 +146,32 @@ def daily():
             write_to_file(NEW, fn, f)
 
         atr, row0, row1, row2 = get_last_three(fn)
-        print(row1)
 
-    	cs_0 = cs.CandleStick(float(row0[3]),float(row0[4]),
-        float(row0[1]),float(row0[2]), row0[0])
-    	cs_1 = cs.CandleStick(float(row1[3]),float(row1[4]),
-        float(row1[1]),float(row1[2]), row1[0])
-    	cs_2 = cs.CandleStick(float(row2[3]),float(row2[4]),
-        float(row2[1]),float(row2[2]), row2[0])
-        analyze_data(atr, cs_0, cs_1, cs_2)
+        line = row0.split(",")
+        a = float(line[3])
+        b = float(line[4])
+        c = float(line[1])
+        d = float(line[2])
+        e = line[0]
+        cs_0 = cs.CandleStick(a,b,c,d,e)
+
+        line = row1.split(",")
+        a = float(line[3])
+        b = float(line[4])
+        c = float(line[1])
+        d = float(line[2])
+        e = line[0]
+        cs_1 = cs.CandleStick(a,b,c,d,e)
+
+        line = row2.split(",")
+        a = float(line[3])
+        b = float(line[4])
+        c = float(line[1])
+        d = float(line[2])
+        e = line[0]
+        cs_2 = cs.CandleStick(a,b,c,d,e)
+
+        analyze_data(cs_0, cs_1, cs_2, atr)
 
 
 def back_test():
@@ -178,8 +192,8 @@ def back_test():
                     cs_2 = cs_1
                     cs_1 = cs_0
                     cs_0 = cs.CandleStick(float(row[3]),float(row[4]),float(row[1]),float(row[2]), row[0])
-                    quotes = analyze_data(fn)
-                    count += 1
+                    quotes = analyze_data(cs_0, cs_1, cs_2, atr)
+                count += 1
 
 daily()
 back_test()
