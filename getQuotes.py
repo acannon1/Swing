@@ -7,7 +7,8 @@ import os
 import csv
 import candleStick as cs
 import analyzeChart as analyze
-from collections import deque
+import tdAmeritradeApi as td
+#from collections import deque
 # import nasdaqOptions as options
 
 NEW = 0
@@ -195,8 +196,36 @@ def back_test():
                     quotes = analyze_data(cs_0, cs_1, cs_2, atr)
                 count += 1
 
-daily()
-back_test()
+# def processTDA(ticker):
+# daily()
+# back_test()
+
+c = td.TDAmeritradeAPI()
+ticker = 'AAPL'
+quote1 = c.quoteJSON(ticker)
+inDate = datetime.datetime.fromtimestamp(quote1[ticker]['quoteTimeInLong']/1000.0)
+d = str(inDate)[0:10]
+fileString = d + "," + str(format(quote1[ticker]['lowPrice'], '.2f')) + ","
+fileString = fileString + str(format(quote1[ticker]['lowPrice'], '.2f')) + ","
+fileString = fileString + str(format(quote1[ticker]['openPrice'], '.2f')) + ","
+fileString = fileString + str(format(quote1[ticker]['lastPrice'], '.2f')) + ","
+fileString = fileString + str(quote1[ticker]['totalVolume'])
+print(fileString)
+
+ticker = 'AAPL'
+quote1 = c.optionsJSON(ticker)
+print(quote1)
+print(quote1['callExpDateMap'])
+
+# fn = "./quotes/trial.csv";
+# f = open(fn, "w")
+# f.write(quote)
+# quote1.to_csv(fn)
+# print(quote1)
+# f.close
+
+
+
 # options1 = options.NasdaqOptions('AAPL',2)
 # calls, puts = options1.get_options_table()
 # print(calls)
