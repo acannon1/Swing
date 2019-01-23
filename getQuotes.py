@@ -202,21 +202,43 @@ def back_test():
 
 c = td.TDAmeritradeAPI()
 ticker = 'AAPL'
-quote1 = c.quoteJSON(ticker)
-inDate = datetime.datetime.fromtimestamp(quote1[ticker]['quoteTimeInLong']/1000.0)
-d = str(inDate)[0:10]
-fileString = d + "," + str(format(quote1[ticker]['lowPrice'], '.2f')) + ","
-fileString = fileString + str(format(quote1[ticker]['lowPrice'], '.2f')) + ","
-fileString = fileString + str(format(quote1[ticker]['openPrice'], '.2f')) + ","
-fileString = fileString + str(format(quote1[ticker]['lastPrice'], '.2f')) + ","
-fileString = fileString + str(quote1[ticker]['totalVolume'])
-print(fileString)
+# quote1 = c.quoteJSON(ticker)
+# inDate = datetime.datetime.fromtimestamp(quote1[ticker]['quoteTimeInLong']/1000.0)
+# d = str(inDate)[0:10]
+# fileString = d + "," + str(format(quote1[ticker]['lowPrice'], '.2f')) + ","
+# fileString = fileString + str(format(quote1[ticker]['lowPrice'], '.2f')) + ","
+# fileString = fileString + str(format(quote1[ticker]['openPrice'], '.2f')) + ","
+# fileString = fileString + str(format(quote1[ticker]['lastPrice'], '.2f')) + ","
+# fileString = fileString + str(quote1[ticker]['totalVolume'])
+# print(fileString)
+#
+# ticker = 'AAPL'
+# quote1 = c.optionsJSON(ticker)
+# print(quote1)
+# print(quote1['callExpDateMap'])
 
-ticker = 'AAPL'
-quote1 = c.optionsJSON(ticker)
-print(quote1)
-print(quote1['callExpDateMap'])
+def get_atr(candles):
+    sum = 0
+    for candle in candles:
+        sum +=candle['high'] - candle['low']
+    return sum/len(candles)
 
+
+def analyze_using_tda():
+    for ticker in symbols_list:
+        history = c.priceHistoryJSON(ticker)
+        b = get_atr(history['candles'])
+        print(b)
+        # analyze_data(history['candles'])
+        print(history)
+        length = len(history['candles'])
+        print(history['candles'][length - 1])
+        # analyze.hammer(history['candles'][length - 1], history['candles'][length - 2])
+
+analyze_using_tda()
+
+# a = (datetime.datetime(2019,1,22) - datetime.datetime(1970,1,1)).total_seconds() * 1000
+# print(a)
 # fn = "./quotes/trial.csv";
 # f = open(fn, "w")
 # f.write(quote)

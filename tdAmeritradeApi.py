@@ -30,6 +30,22 @@ class TDAmeritradeAPI(object):
         x = self.quote(symbol)
         return x
 
+    def priceHistory(self, symbol):
+        return requests.get(HISTORY % symbol,
+                            headers=self._headers(),
+                            # params={'symbol': symbol.upper(),
+                            # 'periodType': 'month',
+                            # 'frequencyType': 'daily',
+                            # 'endDate': 1548115200000,
+                            # 'startDate': 1547445600000}).json()
+                            params={'symbol': symbol.upper(),
+                            'periodType': 'month',
+                            'frequencyType': 'daily'}).json()
+
+    def priceHistoryJSON(self, symbol):
+        x = self.priceHistory(symbol)
+        return x
+
     def options(self, symbol):
         return requests.get(OPTIONCHAIN,
                             headers=self._headers(),
